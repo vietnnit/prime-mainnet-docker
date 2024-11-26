@@ -16,21 +16,17 @@ be spun up directly.
 
 For detals consult the docker compose file but at the time of writing, the followinge versions apply:
 
-| Network | Folder     | prime-relay | ogmios | db-sync  | postgres     | blockfrost | wallet-api | icarus      |
-|---------|------------|-------------|--------|----------|--------------|------------|------------|-------------|
-| testnet | node-9.2.1 |    9.2.1    | v6.8.0 | 13.5.0.2 | 14.10-alpine |   v1.7.0   | 2023.12.18 | v2023-04-14 |
-| testnet | node-8.9.4 |    8.9.4    | v6.3.0 | 13.2.0.2 | 14.10-alpine |   v1.7.0   | 2023.12.18 | v2023-04-14 |
-| testnet | node-8.7.3 |    8.7.3    | v6.1.0 | 13.2.0.1 | 14.10-alpine |   v1.7.0   | 2023.12.18 | v2023-04-14 |
+| Network | Folder     | prime-relay | ogmios | db-sync  | postgres     |
+|---------|------------|-------------|--------|----------|--------------|
+| mainnet | node-8.9.4 |    8.9.4    | v6.4.0 | 13.2.0.2 | 14.10-alpine |
+
 
 Docker compose file is starting following containers:
 
-* prime-relay (standalone, prerequisite for dbsync and wallet-api)
+* prime-relay (standalone, prerequisite for dbsync)
 * ogmios (requires prime-relay)
-* postgres (standalone, prerequisite for dbsync and blockfrost)
+* postgres (standalone, prerequisite for dbsync)
 * dbsync (requires prime-relay and postgres)
-* blockfrost (requires postgres and consequently dbsync to keep it up to date)
-* wallet-api (requires prime-relay)
-* icarus (requires wallet-api)
 
 The docker compose file is envisioned as example of available tooling and will start all of them in sequence.
 Feel free to exclude/modify listed services as per your requirements, following the dependency comments.
@@ -54,18 +50,18 @@ docker compose up -d
 
 ## Apex node relay
 
-This is a relay node connected to a running `prime-public-testnet` network. All `cardano-cli` commands apply as usual.
+This is a relay node connected to a running `prime-mainnet` network. All `cardano-cli` commands apply as usual.
 
 For more details consult the `README.md` file from the tool version folder that compose was started from.
 
 
 ## Ogmios API
 
-For ogmios api consult the [online documentation](https://ogmios.dev/api/v5.6/).
-To check ogmios http api point a browser to `localhost` port `1733`, for example:
+For ogmios api consult the [online documentation](https://ogmios.dev/api/v6.4/).
+To check ogmios http api point a browser to `localhost` port `1337`, for example:
 
 ```
-http://localhost:1733/
+http://localhost:1337/
 ```
 
 
@@ -79,44 +75,6 @@ DbSync is indexer created as ETL tool coprised of three components:
 
 Credentials to access the postgres database are in `secrets/dbsync/` folder. They are example credentials
 and are *NOT* to be used unaltered in any settings other than a local ephemeral test.
-
-
-## Blockfrost
-
-Blockfrost is an instant, highly optimized and accessible API as a Service that serves as an alternative access
-to the Cardano blockchain and related networks, with extra features.
-
-For blockfrost api consult the [online documentation](https://docs.blockfrost.io/).
-To check the blockfrost point a browser to `localhost` port `3033`, for example:
-
-```
-http://localhost:3033
-http://localhost:3033/epochs/latest
-```
-
-## Wallet API and Icarus
-
-Wallet API provides an HTTP Application Programming Interface (API) and command-line interface (CLI) for
-working with wallets. It also featuers a lightweight frontend web interface called Icarus.
-
-For wallet-api consult the [online documentation](https://cardano-foundation.github.io/cardano-wallet/api/edge/).
-To check the wallet-api point a browser to `localhost` port `8290`, for example:
-
-```
-http://localhost:8290/v2/network/information
-http://localhost:8290/v2/network/clock
-```
-
-To check the icarus wallet-api ui point a browser to `localhost` port `4477` and then click `Connect` button, for example:
-
-```
-http://localhost:4477/
-http://localhost:4477/network-info
-```
-
-Note that if you are also running a vector testnet compose setup on the same machine you can connect icarus 
-from either prime or vector setup on either wallet-api by targetting the desired one. Default ports for them are
-8190 for prime testnet and 8090 for vector testnet.
 
 
 ## Remove procedure
