@@ -17,7 +17,7 @@ For detals consult the docker compose file but at the time of writing, the follo
 
 | Component   | Version      | Docker registry                      |
 |-------------|--------------|--------------------------------------|
-| prime-relay |        9.2.1 | ghcr.io/intersectmbo/cardano-node    |
+| prime-relay |        8.9.4 | ghcr.io/intersectmbo/cardano-node    |
 | ogmios      |       v6.4.0 | cardanosolutions/ogmios              |
 | postgres    | 14.10-alpine | postgres                             |
 | dbsync      |     13.2.0.2 | ghcr.io/intersectmbo/cardano-db-sync |
@@ -41,12 +41,12 @@ docker compose up -d
 
 ## Apex node relay
 
-This is a relay node connected to a running `prime-mainnet-9.2.1` network. All `cardano-cli` commands apply as usual. For example:
+This is a relay node connected to a running `prime-mainnet-894` network. All `cardano-cli` commands apply as usual. For example:
 
 To check the tip (at the moment it is about 10 min to sync, will definitely vary over time):
 
 ```
-docker exec -it prime-public-testnet-tools-9_2_1-prime-relay-1 cardano-cli query tip --testnet-magic 3311 --socket-path /ipc/node.socket
+docker exec -it prime-mainnet-894-prime-relay-1 cardano-cli query tip --network-magic 764824073 --socket-path /ipc/node.socket
 ```
 
 
@@ -78,8 +78,8 @@ To remove containers and volumes, images will be left for fast restart:
 ```
 docker compose down
 docker volume rm \
-  prime-public-testnet-tools-9_2_1_db-sync-data \
-  prime-public-testnet-tools-9_2_1_node-db \
-  prime-public-testnet-tools-9_2_1_node-ipc \
-  prime-public-testnet-tools-9_2_1_postgres
+  prime-mainnet-894_db-sync-data \
+  prime-mainnet-894_node-db \
+  prime-mainnet-894_node-ipc \
+  prime-mainnet-894_postgres
 ```
