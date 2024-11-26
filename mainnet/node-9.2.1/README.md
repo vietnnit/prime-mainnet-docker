@@ -1,28 +1,6 @@
-# Apex prime relay and tooling repository
+# Apex prime public testnet relay and tooling
 
-This repository contains docker compose setup to launch apex prime network components.
-
-Notes:
-
-* There are multiple versions of tool sets used, see the below table for details.
-* Secrets stored in the respository (database access credentials) are for example purposes only and should
-*NOT* be used in any real scenario unaltered. They are set only for completeness so that a local setup can
-be spun up directly.
-* Full set of genesis, topology and configuration files are within each tool version subfolders.
-* Details for each of the versions of the tool sets are in separate README.md files in appropriate subfolders.
-
-
-# Versions of the tool sets
-
-For detals consult the docker compose file but at the time of writing, the followinge versions apply:
-
-| Network | Folder     | prime-relay | ogmios | db-sync  | postgres     | blockfrost | wallet-api | icarus      |
-|---------|------------|-------------|--------|----------|--------------|------------|------------|-------------|
-| testnet | node-9.2.1 |    9.2.1    | v6.8.0 | 13.5.0.2 | 14.10-alpine |   v1.7.0   | 2023.12.18 | v2023-04-14 |
-| testnet | node-8.9.4 |    8.9.4    | v6.3.0 | 13.2.0.2 | 14.10-alpine |   v1.7.0   | 2023.12.18 | v2023-04-14 |
-| testnet | node-8.7.3 |    8.7.3    | v6.1.0 | 13.2.0.1 | 14.10-alpine |   v1.7.0   | 2023.12.18 | v2023-04-14 |
-
-Docker compose file is starting following containers:
+This docker compose file is starting following containers:
 
 * prime-relay (standalone, prerequisite for dbsync and wallet-api)
 * ogmios (requires prime-relay)
@@ -35,10 +13,22 @@ Docker compose file is starting following containers:
 The docker compose file is envisioned as example of available tooling and will start all of them in sequence.
 Feel free to exclude/modify listed services as per your requirements, following the dependency comments.
 
+For detals consult the docker compose file but at the time of writing, the followinge versions apply:
+
+| Component   | Version      | Docker registry                      |
+|-------------|--------------|--------------------------------------|
+| prime-relay |        9.2.1 | ghcr.io/intersectmbo/cardano-node    |
+| ogmios      |       v6.3.0 | cardanosolutions/ogmios              |
+| postgres    | 14.10-alpine | postgres                             |
+| dbsync      |     13.2.0.2 | ghcr.io/intersectmbo/cardano-db-sync |
+| blockfrost  |       v1.7.0 | blockfrost/backend-ryo               |
+| wallet-api  |   2023.12.18 | cardanofoundation/cardano-wallet     |
+| icarus      |  v2023-04-14 | piotrstachyra/icarus                 |
+
 
 ## Prerequisites:
 
-* intel based linux system (this was tested on, will most likely work on other platforms as well)
+* intel based linux system (this was tested on)
 * docker with compose
 * network
 
@@ -54,9 +44,13 @@ docker compose up -d
 
 ## Apex node relay
 
-This is a relay node connected to a running `prime-public-testnet` network. All `cardano-cli` commands apply as usual.
+This is a relay node connected to a running `prime-public-testnet` network. All `cardano-cli` commands apply as usual. For example:
 
-For more details consult the `README.md` file from the tool version folder that compose was started from.
+To check the tip (at the moment it is about 10 min to sync, will definitely vary over time):
+
+```
+docker exec -it prime-public-testnet-tools-9_2_1-prime-relay-1 cardano-cli query tip --testnet-magic 3311 --socket-path /ipc/node.socket
+```
 
 
 ## Ogmios API
@@ -77,8 +71,7 @@ DbSync is indexer created as ETL tool coprised of three components:
 * dbsync etl tool (to react to block events, parse them and store them to postgres database)
 * postgres database
 
-Credentials to access the postgres database are in `secrets/dbsync/` folder. They are example credentials
-and are *NOT* to be used unaltered in any settings other than a local ephemeral test.
+Credentials to access the postgres database are in `secrets/dbsync/` folder.
 
 
 ## Blockfrost
@@ -121,4 +114,14 @@ from either prime or vector setup on either wallet-api by targetting the desired
 
 ## Remove procedure
 
-To remove containers and volumes, consult the `README.md` file in actual tool folder that compose was started from
+To remove containers and volumes, images will be left for fast restart:
+
+```
+docker compose down
+docker volume rm \
+  prime-public-testnet-tools-9_2_1_db-sync-data \
+  prime-public-testnet-tools-9_2_1_node-db \
+  prime-public-testnet-tools-9_2_1_node-ipc \
+  prime-public-testnet-tools-9_2_1_postgres \
+  prime-public-testnet-tools-9_2_1_wallet-api-data
+```

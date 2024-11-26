@@ -1,0 +1,20 @@
+{
+  "bootstrapPeers": [
+    {
+      "address": "bootstrap.prime.apexfusion.org",
+      "port": 5381
+    }
+  ],
+  "localRoots": [
+  ],
+  "publicRoots" : [
+    { "accessPoints": [
+        { "address": "relay-3.prime.apexfusion.org", "port": 5381 },
+        { "address": "relay-4.prime.apexfusion.org", "port": 5381 }
+      ],
+      "advertise": true,
+      "valency": 1
+    }
+  ],
+  "useLedgerAfterSlot": 0
+}
