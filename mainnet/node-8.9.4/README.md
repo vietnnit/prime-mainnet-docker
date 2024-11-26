@@ -2,13 +2,10 @@
 
 This docker compose file is starting following containers:
 
-* prime-relay (standalone, prerequisite for dbsync and wallet-api)
+* prime-relay (standalone, prerequisite for dbsync)
 * ogmios (requires prime-relay)
-* postgres (standalone, prerequisite for dbsync and blockfrost)
+* postgres (standalone, prerequisite for dbsync)
 * dbsync (requires prime-relay and postgres)
-* blockfrost (requires postgres and consequently dbsync to keep it up to date)
-* wallet-api (requires prime-relay)
-* icarus (requires wallet-api)
 
 The docker compose file is envisioned as example of available tooling and will start all of them in sequence.
 Feel free to exclude/modify listed services as per your requirements, following the dependency comments.
