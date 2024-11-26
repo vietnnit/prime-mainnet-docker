@@ -43,7 +43,7 @@ This is a relay node connected to a running `prime-mainnet-894` network. All `ca
 To check the tip (at the moment it is about 10 min to sync, will definitely vary over time):
 
 ```
-docker exec -it prime-mainnet-894-prime-relay-1 cardano-cli query tip --network-magic 764824073 --socket-path /ipc/node.socket
+docker exec -it prime-mainnet-894-prime-relay-1 cardano-cli query tip --mainnet --socket-path /ipc/node.socket
 ```
 
 
