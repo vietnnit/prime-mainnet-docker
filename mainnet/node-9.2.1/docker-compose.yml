@@ -1,5 +1,5 @@
-version: "3.9"
-name: prime-mainnet-8.9.4
+version: "1"
+name: prime-mainnet-9.2.1
 
 services:
   # ===========
@@ -8,7 +8,7 @@ services:
   #
   # standalone
   prime-relay:
-    image: ghcr.io/intersectmbo/cardano-node:8.9.4
+    image: ghcr.io/intersectmbo/cardano-node:9.2.1
     environment:
       - CARDANO_BLOCK_PRODUCER=false
       - CARDANO_CONFIG=/config/configuration.yaml
@@ -47,7 +47,7 @@ services:
   #
   # requires: prime-relay
   ogmios:
-    image: cardanosolutions/ogmios:v6.4.0
+    image: cardanosolutions/ogmios:v6.8.0
     restart: on-failure
     command: [
       "--host", "0.0.0.0",
@@ -106,7 +106,7 @@ services:
   #
   # requires: apex-relay and postgres
   db-sync:
-    image: ghcr.io/intersectmbo/cardano-db-sync:13.2.0.2
+    image: ghcr.io/intersectmbo/cardano-db-sync:13.5.0.2
     environment:
       - DISABLE_LEDGER=${DISABLE_LEDGER:-}
       - POSTGRES_HOST=postgres
@@ -142,6 +142,111 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+  # =======================
+  # blockfrost run your own
+  # =======================
+  #
+  # requires: postgres (consequently dbsync to update the data withing the database)
+  blockfrost:
+    image: blockfrost/backend-ryo:v1.7.0
+    environment:
+      - BLOCKFROST_CONFIG_SERVER_LISTEN_ADDRESS=0.0.0.0
+      - PGPASSWORD_FILE=/run/secrets/postgres_password
+      - NODE_ENV=testnet
+      - BLOCKFROST_CONFIG_SERVER_PORT=3000
+      - BLOCKFROST_CONFIG_SERVER_DEBUG=true
+      - BLOCKFROST_CONFIG_SERVER_PROMETHEUS_METRICS=false
+      - BLOCKFROST_CONFIG_DBSYNC_HOST=postgres
+      - BLOCKFROST_CONFIG_DBSYNC_USER_FILE=/run/secrets/postgres_user
+      - BLOCKFROST_CONFIG_DBSYNC_DATABASE_FILE=/run/secrets/postgres_db
+      - BLOCKFROST_CONFIG_DBSYNC_MAX_CONN=10
+      - BLOCKFROST_CONFIG_NETWORK=testnet
+      - BLOCKFROST_CONFIG_TOKEN_REGISTRY_URL=https://tokens.cardano.org
+    depends_on:
+      db-sync:
+        condition: service_started
+    entrypoint:
+      - '/nix/store/7q1b1bsmxi91zci6g8714rcljl620y7f-bash-5.2-p15/bin/bash'
+      - '-c'
+      - |
+        mkdir /app/config;
+        export PATH=$$PATH:/nix/store/f11ibsj5vmqcy8ihfa8mzvpfs4af7cw5-coreutils-9.1/bin;
+        export PGPASSWORD=$$(cat $$PGPASSWORD_FILE);
+        export BLOCKFROST_CONFIG_DBSYNC_USER=$$(cat $$BLOCKFROST_CONFIG_DBSYNC_USER_FILE);
+        export BLOCKFROST_CONFIG_DBSYNC_DATABASE=$$(cat $$BLOCKFROST_CONFIG_DBSYNC_DATABASE_FILE);
+        /nix/store/y52li35j2ldsh5ax4xzq8zdnr3hpb3rc-blockfrost-backend-ryo/bin/blockfrost-backend-ryo
+    ports:
+      - ${POSTGRES_PORT:-3033}:3000
+    secrets:
+      - postgres_password
+      - postgres_user
+      - postgres_db
+#    volumes:
+#      - ./config/blockfrost:/app/config
+    restart: on-failure
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  # ==========
+  # wallet api
+  # ==========
+  #
+  # requires: prime-relay
+  wallet-api:
+    image: cardanofoundation/cardano-wallet:2023.12.18
+    volumes:
+      - wallet-api-data:/wallet-db
+      # use either docker volume (see volumes below) or local host folder if interracting from host over ipc
+      # change here affects - db-sync, wallet-api, ogmios
+      # - node-ipc:/ipc
+      - ./node-ipc:/ipc
+      - ./config/node/genesis:/config/genesis
+
+    ports:
+      - 8290:8090
+    entrypoint: []
+    command: bash -c "
+        ([[ $$NETWORK == \"mainnet\" ]] && $$CMD --mainnet) ||
+        ($$CMD --testnet /config/genesis/byron/genesis.json)
+      "
+    environment:
+      CMD: "cardano-wallet serve --node-socket /ipc/node.socket --database /wallet-db --listen-address 0.0.0.0"
+      NETWORK:
+    depends_on:
+      prime-relay:
+        condition: service_healthy
+    restart: on-failure
+    logging:
+      driver: "json-file"
+      options:
+        compress: "true"
+        max-file: "10"
+        max-size: "50m"
+
+  # ======
+  # icarus
+  # ======
+  #
+  # requires: wallet-api
+  icarus:
+    image: piotrstachyra/icarus:v2023-04-14
+    environment:
+      - ICARUS_PORT=4477
+      - ICARUS_BIND_ADDR=0.0.0.0
+    entrypoint: []
+    command: sh -c "
+        /bin/sed -i 's/8090/8290/g' app.rb && \
+        /bin/sed -i 's/8090/8290/g' views/discovery.erb && \
+        ruby app.rb
+      "
+    network_mode: "host"
+    restart: on-failure
+    depends_on:
+      wallet-api:
+        condition: service_started
 
 secrets:
   # prerequisite for: postgres, dbsync
@@ -160,3 +265,5 @@ volumes:
   postgres:
   # required for: dbsync
   db-sync-data:
+  # required for - wallet-api
+  wallet-api-data:
