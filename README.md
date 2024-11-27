@@ -16,9 +16,9 @@ be spun up directly.
 
 For detals consult the docker compose file but at the time of writing, the followinge versions apply:
 
-| Network | Folder     | prime-relay | ogmios | db-sync  | postgres     |
-|---------|------------|-------------|--------|----------|--------------|
-| mainnet | node-8.9.4 |    8.9.4    | v6.4.0 | 13.2.0.2 | 14.10-alpine |
+| Network | Folder     | prime-relay | ogmios | db-sync  | postgres     | blockfrost |  wallet-api  |   icarus   |
+|---------|------------|-------------|--------|----------|--------------|------------|--------------|------------|
+| mainnet | node-9.2.1 |    9.2.1    | v6.8.0 | 13.5.0.2 | 14.10-alpine |    1.7.0   |  2023.12.18  | 2023-04-14 |
 
 
 Docker compose file is starting following containers:
@@ -57,7 +57,8 @@ For more details consult the `README.md` file from the tool version folder that 
 
 ## Ogmios API
 
-For ogmios api consult the [online documentation](https://ogmios.dev/api/v6.4/).
+For ogmios api consult the [online documentation](https://ogmios.dev/api/v6.8/).
+
 To check ogmios http api point a browser to `localhost` port `1337`, for example:
 
 ```
