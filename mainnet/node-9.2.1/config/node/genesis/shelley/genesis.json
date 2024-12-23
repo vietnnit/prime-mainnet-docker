@@ -29,7 +29,7 @@
       "tag": "NeutralNonce"
     },
     "protocolVersion": {
-      "major": 7,
+      "major": 2,
       "minor": 0
     },
     "minUTxOValue": 1000000

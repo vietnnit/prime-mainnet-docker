@@ -1,16 +1,13 @@
 {
   "bootstrapPeers": [
-    {
-      "address": "bootstrap.prime.apexfusion.org",
-      "port": 5381
-    }
+    { "address": "bootstrap.prime.mainnet.apexfusion.org", "port": 5521 }
   ],
   "localRoots": [
   ],
   "publicRoots" : [
     { "accessPoints": [
-        { "address": "relay-3.prime.apexfusion.org", "port": 5381 },
-        { "address": "relay-4.prime.apexfusion.org", "port": 5381 }
+        { "address": "relay-g1.prime.mainnet.apexfusion.org", "port": 5521 },
+        { "address": "relay-g2.prime.mainnet.apexfusion.org", "port": 5521 }
       ],
       "advertise": true,
       "valency": 1
