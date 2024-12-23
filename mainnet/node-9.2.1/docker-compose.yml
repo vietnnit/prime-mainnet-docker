@@ -104,7 +104,7 @@ services:
   # db sync
   # =======
   #
-  # requires: apex-relay and postgres
+  # requires: prime-relay and postgres
   db-sync:
     image: ghcr.io/intersectmbo/cardano-db-sync:13.5.0.2
     environment:
