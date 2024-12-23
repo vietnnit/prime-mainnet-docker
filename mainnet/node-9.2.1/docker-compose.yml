@@ -243,12 +243,12 @@ services:
         /bin/sed -i 's/8090/8290/g' app.rb && \
         /bin/sed -i 's/8090/8290/g' views/discovery.erb && \
         ruby app.rb"
-    network_mode: "host"
     restart: on-failure
     depends_on:
       wallet-api:
         condition: service_started
-
+    ports:
+      - 4477:4477
 secrets:
   # prerequisite for: postgres, dbsync
   postgres_db:
