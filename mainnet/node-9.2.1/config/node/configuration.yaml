@@ -7,11 +7,8 @@
 ##### Locations #####
 
 ByronGenesisFile: genesis/byron/genesis.json
-ByronGenesisHash: 6b91f3c3d68ebeaa8dede86ba371a56ae60547dec6a8713d1fca6e403caa4605
 ShelleyGenesisFile: genesis/shelley/genesis.json
-ShelleyGenesisHash: 7368f016d46583e161170a746b996aa04dc2d248104bda3d81600450bee9932c
 AlonzoGenesisFile: genesis/shelley/genesis.alonzo.json
-AlonzoGenesisHash: 1cd94b66eade0670885744a858accdb2c3249e43e247db2c66b158050ec6a3e4
 ConwayGenesisFile: genesis/shelley/genesis.conway.json
 SocketPath: db/node.socket
 
@@ -36,17 +33,17 @@ MaxConcurrencyDeadline: 2
 Protocol: Cardano
 
 # The mainnet does not include the network magic into addresses. Testnets do.
-RequiresNetworkMagic: RequiresMagic
+RequiresNetworkMagic: RequiresNoMagic
 
 
 ##### Update system parameters #####
 
 # This protocol version number gets used by block producing nodes as part
 # of the system for agreeing on and synchronising protocol updates.
-LastKnownBlockVersion-Major: 6
+LastKnownBlockVersion-Major: 7
 LastKnownBlockVersion-Minor: 0
 LastKnownBlockVersion-Alt: 0
-
+MaxKnownMajorProtocolVersion: 7
 ##### Logging configuration #####
 
 # Enable or disable logging overall
@@ -79,14 +76,14 @@ defaultBackends:
 # EKG is a simple metrics monitoring system. Uncomment the following to enable
 # this backend and listen on the given local port and point your web browser to
 # http://localhost:12788/
-hasEKG: 14788
+hasEKG: 12788
 
 # The Prometheus monitoring system exports EKG metrics. Uncomment the following
 # to listen on the given port. Output is provided on
 # http://localhost:12789/metrics
 hasPrometheus:
   - "0.0.0.0"
-  - 14789
+  - 12789
 
 # To enable the legacy 'TraceForwarder' backend, uncomment the following setting. Log
 # items are then forwarded based on an entry in 'mapBackends' to a separate
@@ -205,7 +202,7 @@ TraceIpSubscription: True
 TraceLocalRootPeers: True
 
 # Trace public root peers
-TracePublicRootPeers: True 
+TracePublicRootPeers: True
 
 # Trace peer selection
 TracePeerSelection: True
@@ -294,10 +291,6 @@ options:
   mapSeverity:
     cardano.node.ChainDB: Notice
     cardano.node.DnsSubscription: Debug
-TestShelleyHardForkAtEpoch: 0
-TestAllegraHardForkAtEpoch: 0
-TestMaryHardForkAtEpoch: 0
-TestAlonzoHardForkAtEpoch: 0
 
 # P2P
 
@@ -308,10 +301,10 @@ EnableP2P: True
 #  MaxConcurrencyBulkSync: 2
 #  # The maximum number of used peers when fetching newly forged blocks.
 #  MaxConcurrencyDeadline: 2
-TargetNumberOfRootPeers: 20
-TargetNumberOfKnownPeers: 20
-TargetNumberOfEstablishedPeers: 10
-TargetNumberOfActivePeers: 10
+TargetNumberOfRootPeers: 10
+TargetNumberOfKnownPeers: 100
+TargetNumberOfEstablishedPeers: 40
+TargetNumberOfActivePeers: 20
 TraceInboundGovernorCounters: True
 TraceConnectionManagerTransitions: True
 TraceLedgerPeers: True
